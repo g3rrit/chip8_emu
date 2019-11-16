@@ -84,7 +84,9 @@ int main(int argc, char **argv) {
 
     // SPIN CPU
     
-    cpu_spin();
+    if(cpu_spin()) {
+      gfx_render_present();
+    }
 
     // ADJUST HZ
 

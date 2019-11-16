@@ -2,6 +2,12 @@
 
 uint8_t screen[SCREEN_WIDTH * SCREEN_HEIGHT];
 
+void screen_clear() {
+  for (uint32_t i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT) {
+    screen[i] = 0;
+  }
+}
+
 uint32_t window_width = 600;
 uint32_t window_height = 600;
 
@@ -19,9 +25,7 @@ void gfx_init() {
   CHECK(SDL_Init(SDL_INIT_VIDEO));
   CHECK(SDL_CreateWindowAndRenderer(window_width, window_height, SDL_WINDOW_RESIZABLE, &window, &renderer));
 
-  for (uint32_t i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-    screen[i] = 0;
-  }
+  screen_clear();
 }
 
 void gfx_delete() {

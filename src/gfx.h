@@ -6,6 +6,8 @@
 #define SCREEN_WIDTH 64
 #define SCREEN_HEIGHT 32
 
+void screen_clear();
+
 void gfx_init();
 
 void gfx_delete();
