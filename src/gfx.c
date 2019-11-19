@@ -3,7 +3,7 @@
 uint8_t screen[SCREEN_WIDTH * SCREEN_HEIGHT];
 
 void screen_clear() {
-  for (uint32_t i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT) {
+  for (uint32_t i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
     screen[i] = 0;
   }
 }
@@ -17,7 +17,7 @@ SDL_Window *window;
 
 #define CHECK(r) {          \
   if (r) {                  \
-    error(SDL_GetError());  \
+    panic(SDL_GetError());  \
   }                         \
 }
 

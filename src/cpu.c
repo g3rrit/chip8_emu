@@ -69,7 +69,7 @@ void cpu_load(char *path) {
 
   FILE *file = fopen(path, "rb");
   if (!file) {
-    error("unable to open file %s\n", path);
+    panic("unable to open file %s\n", path);
   }
 
   fread(cpu.mem + 0x200, MEM_SIZE - 0x200, 1, file);
@@ -77,16 +77,16 @@ void cpu_load(char *path) {
   fclose(file);
 }
 
-inline uint16_t push(uint16_t add) {
+static inline uint16_t push(uint16_t add) {
   if (cpu.sp >= STACK_SIZE - 1) {
-    error("stack size exceeded\n");
+    panic("stack size exceeded\n");
   }
   return cpu.stack[cpu.sp++] = add;
 }
 
-inline uint16_t pop() {
+static inline uint16_t pop() {
   if (cpu.sp <= 1) {
-    error("unable to pop stack\n");
+    panic("unable to pop stack\n");
   }
   return cpu.stack[cpu.sp--];
 }
@@ -99,7 +99,7 @@ int cpu_spin() {
 
   // FETCH
   uint16_t op = cpu.mem[cpu.pc] << 8 | cpu.mem[cpu.pc + 1];
-  pc += 2;
+  cpu.pc += 2;
   
   // DECODE 
   // EXECUTE
@@ -189,8 +189,6 @@ int cpu_spin() {
           cpu.v[GETO(2)] >>= 1;
           break;
       }
-    }
-
   }
 
   return draw_flag;
