@@ -7,6 +7,9 @@
 
 int main(int argc, char **argv) {
 
+  // seed rng
+  srand(time(0));
+
   cpu_reset();
 
   if (argc < 2) {
@@ -84,9 +87,9 @@ int main(int argc, char **argv) {
 
     // SPIN CPU
     
-    if(cpu_spin()) {
-      gfx_render_present();
-    }
+    //if(cpu_spin()) {
+    //  gfx_render_present();
+    //}
 
     // ADJUST HZ
 

@@ -12,9 +12,6 @@ struct cpu_t {
   // REGISTERS
   uint8_t v[16];
 
-  // FLAG REGISTER
-  uint8_t vf;
-
   // INDEX REGISTER
   uint16_t i;
 
@@ -24,6 +21,12 @@ struct cpu_t {
 
   // PROGRAM COUNTER
   uint16_t pc;
+
+  // DELAY TIMER
+  uint8_t dt;
+
+  // SOUND TIMER
+  uint8_t st;
 } cpu;
 
 #define FONTSET_SIZE 80
@@ -89,6 +92,17 @@ static inline uint16_t pop() {
     panic("unable to pop stack\n");
   }
   return cpu.stack[cpu.sp--];
+}
+
+static inline draw_sprite(uint8_t x, uint8_t y, uint8_t n) {
+  for (uint8_t i = 0; i < n; i++) {
+    uint8_t l = cpu.mem[cpu.i + i];
+    for (uint8_t b = 7; b >= 0: b--) {
+      if ((l >> b) & 1) {
+        if (!gfx_set(x, y)) cpu.v[0xf] = 1;
+      }
+    }
+  }
 }
 
 int cpu_spin() {
@@ -162,33 +176,82 @@ int cpu_spin() {
         case 4:
           {
             uint16_t r = cpu.v[GETO(2)] + cpu.v[GETO(1)];
-            cpu.vf = (r >= 255);
+            cpu.v[0xf] = (r >= 255);
             cpu.v[GETO(2)] = (uint8_t) r;
             break;
           }
         case 5:
           {
             uint16_t r = cpu.v[GETO(2)] - cpu.v[GETO(1)];
-            cpu.vf = (r >= 255);
+            cpu.v[0xf] = (r >= 255);
             cpu.v[GETO(2)] = (uint8_t) r;
             break;
           }
         case 6:
-          cpu.vf = cpu.v[GETO(2)] & 1;
+          cpu.v[0xf] = cpu.v[GETO(2)] & 1;
           cpu.v[GETO(2)] >>= 1;
           break;
         case 7:
           {
             uint16_t r = cpu.v[GETO(1)] - cpu.v[GETO(2)];
-            cpu.vf = (r >= 255);
+            cpu.v[0xf] = (r >= 255);
             cpu.v[GETO(2)] = (uint8_t) r;
             break;
           }
-        case 8:
-          cpu.vf = cpu.v[GETO(2)] & 1;
-          cpu.v[GETO(2)] >>= 1;
+        case 0xe:
+          cpu.v[0xf] = cpu.v[GETO(2)] & 128;
+          cpu.v[GETO(2)] <<= 1;
           break;
       }
+    case 9:
+      if (cpu.v[GETO(2)] != cpu.v[GETO(1)]) {
+        cpu.pc += 2;
+      }
+      breal
+    case 0xa:
+      cpu.i = op & 0x0fff;
+      break;
+    case 0xb:
+      cpu.pc = op & 0x0fff;
+      cpu.pc += cpu.v[0];
+      break; 
+    case 0xc:
+      cpu.v[GETO(2)] = ((uint8_t) rand() % 255) & (op & 0x00ff);
+      break;
+    case 0xd:
+      draw_sprite(cpu.v[GETO(2)], cpu.v[GETO(1)], GETO(0));
+      break;
+    case 0xe:
+      if ((op & 0x00ff) == 0x9e) {
+        if (key_get(cpu.v[GETO(2)])) {
+          cpu.pc += 2;
+        }
+      } else if ((op & 0x00ff) == 0xa1) {
+        if (!key_get(cpu.v[GETO(2)])) {
+          cpu.pc += 2;
+        }
+      }
+      break;
+    case 0xf:
+      switch (op & 0x00ff) {
+        case 0x0a:
+          break;
+        case 0x15:
+          break;
+        case 0x18:
+          break;
+        case 0x1e:
+          break;
+        case 0x29:
+          break;
+        case 0x33:
+          break;
+        case 0x55:
+          break;
+        case 0x65:
+          break;
+      }
+      break;
   }
 
   return draw_flag;

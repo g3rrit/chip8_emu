@@ -71,8 +71,6 @@ void gfx_render_present() {
 
       for (uint32_t x = 0; x < SCREEN_WIDTH; x++) {
 
-        printf("off: (%d, %d) sf: %f pixel: (%d, %d)\n", offx, offy, sf, cx, cy);
-
         if (screen[y * SCREEN_HEIGHT + x]) {
           CHECK(SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255));
         } else {
@@ -98,8 +96,7 @@ void gfx_render_present() {
 }
 
 uint8_t gfx_set(uint8_t x, uint8_t y) {
-  if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT) return 0;
-  return screen[y * SCREEN_WIDTH + x] ^= 1;
+  return screen[(y % SCREEN_HEIGHT) * SCREEN_WIDTH + (x % SCREEN_WIDTH)] ^= 1;
 }
 
 
