@@ -14,10 +14,10 @@ int main(int argc, char **argv) {
 
   if (argc < 2) {
     printf("usage: chip8 rom.ch8\n");
-    //return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
   }
 
-  //cpu_load(argv[1]);
+  cpu_load(argv[1]);
 
   gfx_init();
   gfx_render_present();
@@ -87,9 +87,9 @@ int main(int argc, char **argv) {
 
     // SPIN CPU
     
-    //if(cpu_spin()) {
-    //  gfx_render_present();
-    //}
+    if(cpu_spin()) {
+      gfx_render_present();
+    }
 
     // ADJUST HZ
 

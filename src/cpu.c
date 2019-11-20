@@ -1,9 +1,10 @@
 #include "cpu.h"
 
 #include "gfx.h"
+#include "input.h"
 
 #define MEM_SIZE 4096
-#define STACK_SIZE 16
+#define STACK_SIZE 64
 
 struct cpu_t {
   // MEMORY
@@ -59,8 +60,10 @@ void cpu_reset() {
     cpu.stack[i] = 0;
   }
   cpu.i = 0; 
-  cpu.pc = 0;
+  cpu.pc = 0x200;
   cpu.sp = 0;
+  cpu.dt = 0;
+  cpu.st = 0;
 
   // load fontset into memory
   for (uint32_t i = 0; i < FONTSET_SIZE; i++) {
@@ -75,31 +78,36 @@ void cpu_load(char *path) {
     panic("unable to open file %s\n", path);
   }
 
-  fread(cpu.mem + 0x200, MEM_SIZE - 0x200, 1, file);
+  for (int i = 0; i < MEM_SIZE - 0x200; i++) {
+    fread(cpu.mem + 0x200 + i, 1, MEM_SIZE - 0x200, file);
+  }
 
   fclose(file);
 }
 
 static inline uint16_t push(uint16_t add) {
+  printf("push\n");
   if (cpu.sp >= STACK_SIZE - 1) {
     panic("stack size exceeded\n");
   }
-  return cpu.stack[cpu.sp++] = add;
+  cpu.stack[cpu.sp++] = cpu.pc;
+  return add;
 }
 
 static inline uint16_t pop() {
-  if (cpu.sp <= 1) {
+  printf("pop\n");
+  if (cpu.sp <= 0) {
     panic("unable to pop stack\n");
   }
-  return cpu.stack[cpu.sp--];
+  return cpu.stack[--cpu.sp];
 }
 
-static inline draw_sprite(uint8_t x, uint8_t y, uint8_t n) {
+static inline void draw_sprite(uint8_t x, uint8_t y, uint8_t n) {
   for (uint8_t i = 0; i < n; i++) {
     uint8_t l = cpu.mem[cpu.i + i];
-    for (uint8_t b = 7; b >= 0: b--) {
+    for (uint8_t b = 7; b >= 0; b--) {
       if ((l >> b) & 1) {
-        if (!gfx_set(x, y)) cpu.v[0xf] = 1;
+        if (!gfx_set(x + b, y + i)) cpu.v[0xf] = 1;
       }
     }
   }
@@ -107,13 +115,15 @@ static inline draw_sprite(uint8_t x, uint8_t y, uint8_t n) {
 
 int cpu_spin() {
 
-#define GETO(n) ((op >> (8 * n)) & 0xf)
+#define GETO(n) ((op >> (4 * n)) & 0xf)
 
   int draw_flag = 0;
 
   // FETCH
   uint16_t op = cpu.mem[cpu.pc] << 8 | cpu.mem[cpu.pc + 1];
+  printf("pc: %x op: %x\n", cpu.pc, op);
   cpu.pc += 2;
+
   
   // DECODE 
   // EXECUTE
@@ -207,7 +217,7 @@ int cpu_spin() {
       if (cpu.v[GETO(2)] != cpu.v[GETO(1)]) {
         cpu.pc += 2;
       }
-      breal
+      break;
     case 0xa:
       cpu.i = op & 0x0fff;
       break;
@@ -220,6 +230,7 @@ int cpu_spin() {
       break;
     case 0xd:
       draw_sprite(cpu.v[GETO(2)], cpu.v[GETO(1)], GETO(0));
+      draw_flag = 1;
       break;
     case 0xe:
       if ((op & 0x00ff) == 0x9e) {
@@ -234,25 +245,61 @@ int cpu_spin() {
       break;
     case 0xf:
       switch (op & 0x00ff) {
-        case 0x0a:
+        case 0x07:
+          cpu.v[GETO(2)] = cpu.dt;
           break;
+        case 0x0a:
+          {
+            int kp = 0;
+            uint8_t k = 0;
+            for (uint8_t i = 0; i < 16; i++) {
+              k = key_get(i);
+              if (k) kp = 1;
+            }
+            if (!k) {
+              cpu.pc -= 2;
+              return draw_flag;
+            }
+            cpu.v[GETO(2)] = k;
+            break;
+          }
         case 0x15:
+          cpu.dt = cpu.v[GETO(2)];
           break;
         case 0x18:
+          cpu.st = cpu.v[GETO(2)];
           break;
         case 0x1e:
+          cpu.v[0xf] = ((uint32_t) cpu.i + (uint32_t) cpu.v[GETO(2)]) >> 16;
+          cpu.i += cpu.v[GETO(2)];
           break;
         case 0x29:
+          cpu.i = cpu.v[GETO(2)] * 5; 
           break;
         case 0x33:
+          if (cpu.i + 2 >= MEM_SIZE) panic("invalid memory access\n");
+          cpu.mem[cpu.i] = cpu.v[GETO(2)] / 100;
+          cpu.mem[cpu.i + 1] = (cpu.v[GETO(2)] / 10) % 10;
+          cpu.mem[cpu.i + 2] = cpu.v[GETO(2)] % 10;
           break;
         case 0x55:
+          if (cpu.i + 15 >= MEM_SIZE) panic("invalid memory access\n");
+          for (int i = 0; i < 16; i++) {
+            cpu.mem[cpu.i + i] = cpu.v[i];
+          }
           break;
         case 0x65:
+          if (cpu.i + 15 >= MEM_SIZE) panic("invalid memory access\n");
+          for (int i = 0; i < 16; i++) {
+            cpu.v[i] = cpu.mem[cpu.i + i];
+          }
           break;
       }
       break;
   }
+
+  cpu.dt--;
+  cpu.st--;
 
   return draw_flag;
 }
