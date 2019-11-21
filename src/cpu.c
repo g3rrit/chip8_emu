@@ -86,7 +86,6 @@ void cpu_load(char *path) {
 }
 
 static inline uint16_t push(uint16_t add) {
-  printf("push\n");
   if (cpu.sp >= STACK_SIZE - 1) {
     panic("stack size exceeded\n");
   }
@@ -95,7 +94,6 @@ static inline uint16_t push(uint16_t add) {
 }
 
 static inline uint16_t pop() {
-  printf("pop\n");
   if (cpu.sp <= 0) {
     panic("unable to pop stack\n");
   }
@@ -103,14 +101,32 @@ static inline uint16_t pop() {
 }
 
 static inline void draw_sprite(uint8_t x, uint8_t y, uint8_t n) {
-  for (uint8_t i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     uint8_t l = cpu.mem[cpu.i + i];
-    for (uint8_t b = 7; b >= 0; b--) {
+    for (int b = 7; b >= 0; b--) {
       if ((l >> b) & 1) {
+        printf("drawing at: %d %d\n", x + b, y + i);
         if (!gfx_set(x + b, y + i)) cpu.v[0xf] = 1;
       }
     }
   }
+}
+
+void cpu_log(FILE *out) {
+  fprintf(out, "+----------------+\n");
+  for (int i = 0; i < 16; i++) {
+    fprintf(out, "| V[%02d] = 0x%02X   |\n", i, cpu.v[i]);
+  }
+  fprintf(out, "| PC    = 0x%04X |\n", cpu.pc);
+  fprintf(out, "| SP    = 0x%04X |\n", cpu.sp);
+  fprintf(out, "| DT    = 0x%02X   |\n", cpu.dt);
+  fprintf(out, "| ST    = 0x%02X   |\n", cpu.st);
+  fprintf(out, "+- - - -  - - - -+\n");
+  fprintf(out, "| STACK          |\n");
+  for (int i = 0; i < cpu.sp; i++) {
+    fprintf(out, "| 0x%04X         |\n", cpu.stack[i]);
+  }
+  fprintf(out, "+----------------+\n");
 }
 
 int cpu_spin() {
@@ -121,7 +137,7 @@ int cpu_spin() {
 
   // FETCH
   uint16_t op = cpu.mem[cpu.pc] << 8 | cpu.mem[cpu.pc + 1];
-  printf("pc: %x op: %x\n", cpu.pc, op);
+  printf("OP: %x\n", op);
   cpu.pc += 2;
 
   
@@ -300,6 +316,8 @@ int cpu_spin() {
 
   cpu.dt--;
   cpu.st--;
+
+  DEBUG(cpu_log(stdout));
 
   return draw_flag;
 }
