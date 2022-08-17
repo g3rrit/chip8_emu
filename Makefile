@@ -35,10 +35,13 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 
-.PHONY: clean
+.PHONY: clean tidy
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+tidy:
+	clang-format -i --style=file src/*.c src/*.h
 
 -include $(DEPS)
 

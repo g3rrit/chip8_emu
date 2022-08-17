@@ -8,20 +8,15 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 
-#define DEBUG_F 1
+static inline void panic(const char * fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    printf("ERROR: ");
+    vprintf(fmt, args);
+    va_end(args);
 
-#define DEBUG(f) (DEBUG_F ? f : (void)0 )
-
-
-static inline void panic(const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  printf("ERROR: ");
-  vprintf(fmt, args);
-  va_end(args);
-
-  exit(-1);
+    exit(-1);
 }
-
 
 #endif

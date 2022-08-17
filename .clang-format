@@ -1,0 +1,102 @@
+# for Vim with vimplug:
+#   Plug 'kana/vim-operator-user' " dependency, which allows overriding the = operator for indentation
+#   autocmd FileType c,cpp,objc map <buffer> = :pyf /usr/share/clang/clang-format.py<CR>
+# makes the usual = (equal) key available for automatic indentation using clang, or just:
+#   :'<,'>pyf /usr/share/clang/clang-format.py
+# for a selection and path taken from an arch linux clang installation
+Language:        Cpp
+BasedOnStyle                         : LLVM
+Standard                             : Cpp03
+# BasedOnStyle:  LLVM
+BraceWrapping:
+  AfterClass:      false
+  AfterControlStatement: false
+  AfterEnum:       false
+  AfterFunction:   false
+  AfterNamespace:  false
+  AfterObjCDeclaration: false
+  AfterStruct:     false
+  AfterUnion:      false
+  BeforeCatch:     false
+  BeforeElse:      false
+  IndentBraces:    true
+ConstructorInitializerIndentWidth: 4
+AlignEscapedNewlinesLeft: false
+AlignTrailingComments: true
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: false
+AlwaysBreakTemplateDeclarations: true
+AlwaysBreakBeforeMultilineStrings: true
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializersBeforeComma: false
+ColumnLimit:     120
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+DerivePointerAlignment: false
+ExperimentalAutoDetectBinPacking: false
+IndentCaseLabels: true
+IndentWrappedFunctionNames: false
+IndentFunctionDeclarationAfterType: false
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: true
+NamespaceIndentation: None
+ObjCSpaceAfterProperty: false
+ObjCSpaceBeforeProtocolList: false
+PenaltyReturnTypeOnItsOwnLine             : 120
+PenaltyBreakBeforeFirstCallParameter      : 100
+PenaltyBreakComment                       : 10
+PenaltyBreakFirstLessLess                 : 0
+PenaltyBreakString                        : 20
+PenaltyExcessCharacter                    : 20
+
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: true
+IndentWidth:     4
+TabWidth:        4
+UseTab:          Never
+BreakBeforeBraces: Linux
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles:  false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterCStyleCast: false
+SpacesInContainerLiterals: true
+SpaceBeforeAssignmentOperators: true
+ContinuationIndentWidth: 4
+CommentPragmas:  '^ IWYU pragma:'
+ForEachMacros:
+  - 'foreach'
+  - 'Q_FOREACH'
+  - 'BOOST_FOREACH'
+  - 'PACE2_STAILQ_FOREACH'
+SpaceBeforeParens: ControlStatements
+DisableFormat:   false
+
+
+# 2017-10-16 fixes...
+
+# things like public: private: in a c++ class (- avoids indentation here)
+AccessModifierOffset                      : -4
+
+PointerAlignment                          : Middle
+AlignAfterOpenBracket                     : Align
+AllowAllParametersOfDeclarationOnNextLine : true
+
+# BinPackParameters: true
+# BinPackArguments: true
+BinPackArguments                          : false
+BinPackParameters                         : false
+
+AlignOperands                             : true
+AlignConsecutiveAssignments               : false
+
+AllowShortFunctionsOnASingleLine          : None
+
+BreakBeforeBinaryOperators                : None
+
+AlwaysBreakAfterReturnType                : None
+
+SortIncludes                              : false
