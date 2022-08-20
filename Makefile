@@ -1,4 +1,4 @@
-TARGET_EXEC ?= a.out
+TARGET_EXEC ?= chip9
 
 CC = clang
 
@@ -14,7 +14,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 LDFLAGS ?= -lSDL2
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -g
+CFLAGS ?= $(INC_FLAGS) -MMD -MP -g -Werror -Wall -Wpedantic -std=c99
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS)
@@ -27,13 +27,7 @@ $(BUILD_DIR)/%.s.o: %.s
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
-
-# c++ source
-$(BUILD_DIR)/%.cpp.o: %.cpp
-	$(MKDIR_P) $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
-
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean tidy
 

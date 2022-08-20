@@ -298,12 +298,9 @@ int cpu_spin()
                     cpu.v[GETO(2)] = cpu.dt;
                     break;
                 case 0x0a: {
-                    int kp = 0;
                     uint8_t k = 0;
                     for (uint8_t i = 0; i < 16; i++) {
                         k = key_get(i);
-                        if (k)
-                            kp = 1;
                     }
                     if (!k) {
                         cpu.pc -= 2;
