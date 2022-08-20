@@ -1,4 +1,4 @@
-TARGET_EXEC ?= chip9
+TARGET_EXEC ?= chip8
 
 CC = clang
 

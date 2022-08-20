@@ -75,9 +75,9 @@ void gfx_render_present()
             for (uint32_t x = 0; x < SCREEN_WIDTH; x++) {
 
                 if (screen[y * SCREEN_WIDTH + x]) {
-                    CHECK(SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255));
+                    CHECK(SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255));
                 } else {
-                    CHECK(SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255));
+                    CHECK(SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255));
                 }
 
                 dxf += sf;
